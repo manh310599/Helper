@@ -33,7 +33,7 @@ class encn_Cambridge {
                 return node.innerText.trim();
         }
 
-        let base = 'https://dictionary.cambridge.org/dictionary/english-vietnamese/';
+        let base = 'https://dictionary.cambridge.org/dictionary/english/';
         let url = base + encodeURIComponent(word);
         let doc = '';
         try {
