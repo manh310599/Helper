@@ -7,7 +7,7 @@ class encn_Cambridge {
     }
 
     async displayName() {
-        return 'Cambridge EN->EN';
+        return 'Cambridge EN->VN';
     }
 
     setOptions(options) {
