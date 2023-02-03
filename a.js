@@ -44,13 +44,13 @@ class encn_Cambridge {
             return [];
         }
 
-        let entries = doc.querySelectorAll('.dictionary__body') || [];
+        let entries = doc.querySelectorAll('#example  .dictionary__body') || [];
         let finalDefinitions = [];
         for (const entry of entries) {
             let definitions = [];
             let audios = [];
 
-            let expression = T(entry.querySelector('.selected'));
+            let expression = T(entry.querySelector('.sentence-souce em'));
             let reading = '';
             let readings = entry.querySelectorAll('#pa #C_C font');
             if (readings) {
@@ -67,7 +67,7 @@ class encn_Cambridge {
             // audios[1] = audios[1] ? 'https://dictionary.cambridge.org' + audios[1].getAttribute('src') : '';
             // //audios[1] = audios[1].replace('https', 'http');
 
-            let sensbodys = entry.querySelectorAll('.dictionary__body') || [];
+            let sensbodys = entry.querySelectorAll('#example ') || [];
             for (const sensbody of sensbodys) {
                 let sensblocks = sensbody.childNodes || [];
                 // let guideWord = T(sensbody.previousElementSibling.querySelector(".guideword"));
@@ -75,7 +75,7 @@ class encn_Cambridge {
                 for (const sensblock of sensblocks) {
                     let phrasehead = '';
                     let defblocks = [];
-                    if (sensblock.classList && sensblock.classList.contains('#example .dictionary__body ul')) {
+                    if (sensblock.classList && sensblock.classList.contains('.dictionary__body')) {
                         phrasehead = T(sensblock.querySelector('.full .sentence-souce'));
                         phrasehead = phrasehead ? `<div class="phrasehead">${phrasehead}</div>` : '';
                         defblocks = sensblock.querySelectorAll(' .full') || [];
