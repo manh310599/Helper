@@ -7,7 +7,7 @@ class encn_Cambridge {
     }
 
     async displayName() {
-        return 'Cambridge EN->VN';
+        return 'Cambridge EN->EN';
     }
 
     setOptions(options) {
@@ -33,7 +33,7 @@ class encn_Cambridge {
                 return node.innerText.trim();
         }
 
-        let base = 'https://dictionary.cambridge.org/dictionary/english-vietnamese/';
+        let base = 'https://www.dictionary4it.com/english-vietnamese/';
         let url = base + encodeURIComponent(word);
         let doc = '';
         try {
@@ -44,30 +44,30 @@ class encn_Cambridge {
             return [];
         }
 
-        let entries = doc.querySelectorAll('.english-vietnamese .kdic') || [];
+        let entries = doc.querySelectorAll('.dictionary__body') || [];
         let finalDefinitions = [];
         for (const entry of entries) {
             let definitions = [];
             let audios = [];
 
-            let expression = T(entry.querySelector('.di-title'));
+            let expression = T(entry.querySelector('.selected'));
             let reading = '';
-            let readings = entry.querySelectorAll('.dpron .ipa');
+            let readings = entry.querySelectorAll('#pa #C_C font');
             if (readings) {
                 let reading_uk = T(readings[0]);
                 let reading_us = T(readings[1]);
                 reading = (reading_uk || reading_us) ? `\/${reading_uk}\/   \/${reading_us}\/ ` : '';
             }
-            let posText = T(entry.querySelector('.di-info .pos'));
+            let posText = T(entry.querySelector('#tl #C_C b font'));
             let pos = posText ? `<span class='pos'>${posText}</span>` : '';
             // audios[0] = entry.querySelector(".uk.dpron-i source");
             // audios[0] = audios[0] ? 'https://dictionary.cambridge.org' + audios[0].getAttribute('src') : '';
             // //audios[0] = audios[0].replace('https', 'http');
             // audios[1] = entry.querySelector(".us.dpron-i source");
             // audios[1] = audios[1] ? 'https://dictionary.cambridge.org' + audios[1].getAttribute('src') : '';
-            //audios[1] = audios[1].replace('https', 'http');
+            // //audios[1] = audios[1].replace('https', 'http');
 
-            let sensbodys = entry.querySelectorAll('.sense-body') || [];
+            let sensbodys = entry.querySelectorAll('.dictionary__body') || [];
             for (const sensbody of sensbodys) {
                 let sensblocks = sensbody.childNodes || [];
                 // let guideWord = T(sensbody.previousElementSibling.querySelector(".guideword"));
@@ -75,23 +75,23 @@ class encn_Cambridge {
                 for (const sensblock of sensblocks) {
                     let phrasehead = '';
                     let defblocks = [];
-                    if (sensblock.classList && sensblock.classList.contains('dpos-h di-head normal-entry')) {
-                        phrasehead = T(sensblock.querySelector('def ddef_d db'));
+                    if (sensblock.classList && sensblock.classList.contains('#example .dictionary__body ul')) {
+                        phrasehead = T(sensblock.querySelector('.full .sentence-souce'));
                         phrasehead = phrasehead ? `<div class="phrasehead">${phrasehead}</div>` : '';
-                        defblocks = sensblock.querySelectorAll('.def-block') || [];
+                        defblocks = sensblock.querySelectorAll(' .full') || [];
                     }
-                    if (sensblock.classList && sensblock.classList.contains('def-block')) {
+                    if (sensblock.classList && sensblock.classList.contains('#example .dictionary__body ul .full')) {
                         defblocks = [sensblock];
                     }
                     if (defblocks.length <= 0) continue;
 
                     // make definition segement
                     for (const defblock of defblocks) {
-                        let eng_tran = T(defblock.querySelector('def ddef_d db'));
+                        let eng_tran = T(defblock.querySelector('.full .sentence-souce'));
                         // let chn_tran = T(defblock.querySelector('.def-body .trans'));
                         if (!eng_tran) continue;
-                        let level = T(defblock.querySelector('.ddef_h .def-info'));
-                        level =  level ? `<span class='level'>${level}</span>` : '';
+                        // let level = T(defblock.querySelector('.ddef_h .def-info'));
+                        // level =  level ? `<span class='level'>${level}</span>` : '';
                         let definition = '';
                         eng_tran = `<span class='eng_tran'>${eng_tran.replace(RegExp(expression, 'gi'),`<b>${expression}</b>`)}</span>`;
                         // chn_tran = `<span class='chn_tran'>${chn_tran}</span>`;
@@ -99,12 +99,12 @@ class encn_Cambridge {
                         definition += phrasehead ? `${phrasehead}${tran}` : `${level}${pos}${guideWord}${tran}`;
 
                         // make exmaple segement
-                        let examps = defblock.querySelectorAll('eg deg') || [];
+                        let examps = defblock.querySelectorAll('.full') || [];
                         if (examps.length > 0 && this.maxexample > 0) {
                             definition += '<ul class="sents">';
                             for (const [index, examp] of examps.entries()) {
                                 if (index > this.maxexample - 1) break; // to control only 2 example sentence.
-                                let eng_examp = T(examp.querySelector('.eg'));
+                                let eng_examp = T(examp.querySelector('.full .sentence-souce'));
                                 // let chn_examp = T(examp.querySelector('.trans'));
                                 definition += `<li class='sent'><span class='eng_sent'>${eng_examp.replace(RegExp(expression, 'gi'),`<b>${expression}</b>`)}</span></li>`;
                             }
@@ -125,12 +125,12 @@ class encn_Cambridge {
                 extrainfo: posText
             });
         }
-        let idioms = doc.querySelectorAll('.pr > .idiom-block') || [];
+        let idioms = doc.querySelectorAll('pos-header dpos-h') || [];
         for (const idiom of idioms) {
             let definitions = [];
             let audios = [];
 
-            let expression = T(idiom.querySelector('tw-bw dhw dpos-h_hw di-title '));
+            let expression = T(idiom.querySelector('.headword'));
             let reading = '';
             // let readings = idiom.querySelectorAll('.pron .ipa');
             // if (readings) {
@@ -138,7 +138,7 @@ class encn_Cambridge {
             //     let reading_us = T(readings[1]);
             //     reading = (reading_uk || reading_us) ? `\/${reading_uk}\/   \/${reading_us}\/ ` : '';
             // }
-            let pos = T(idiom.querySelector('pos dpos'));
+            let pos = T(idiom.querySelector('.posgram'));
             pos = pos ? `<span class='pos'>${pos}</span>` : '';
             // audios[0] = idiom.querySelector(".uk.dpron-i source");
             // audios[0] = audios[0] ? 'https://dictionary.cambridge.org' + audios[0].getAttribute('src') : '';
@@ -147,11 +147,11 @@ class encn_Cambridge {
             // audios[1] = audios[1] ? 'https://dictionary.cambridge.org' + audios[1].getAttribute('src') : '';
             //audios[1] = audios[1].replace('https', 'http');
 
-            let sensbodys = idiom.querySelectorAll('.sense-body') || [];
+            let sensbodys = idiom.querySelectorAll('#example') || [];
             for (const sensbody of sensbodys) {
                 let sensblocks = sensbody.childNodes || [];
-                let guideWord = T(sensbody.previousElementSibling.querySelector(".guideword"));
-                guideWord = guideWord ? `<span class='pos'>${guideWord}</span>` : '';
+                // let guideWord = T(sensbody.previousElementSibling.querySelector(".guideword"));
+                // guideWord = guideWord ? `<span class='pos'>${guideWord}</span>` : '';
                 for (const sensblock of sensblocks) {
                     let phrasehead = '';
                     let defblocks = [];
@@ -160,18 +160,18 @@ class encn_Cambridge {
                     //     phrasehead = phrasehead ? `<div class="phrasehead">${phrasehead}</div>` : '';
                     //     defblocks = sensblock.querySelectorAll('.def-block') || [];
                     // }
-                    if (sensblock.classList && sensblock.classList.contains('def-block')) {
+                    if (sensblock.classList && sensblock.classList.contains('.full')) {
                         defblocks = [sensblock];
                     }
                     if (defblocks.length <= 0) continue;
 
                     // make definition segement
                     for (const defblock of defblocks) {
-                        let eng_tran = T(defblock.querySelector('.ddef_h .def'));
+                        let eng_tran = T(defblock.querySelector('sentence-souce'));
                         // let chn_tran = T(defblock.querySelector('.def-body .trans'));
                         if (!eng_tran) continue;
-                        let level = T(defblock.querySelector('.ddef_h .def-info'));
-                        level =  level ? `<span class='level'>${level}</span>` : '';
+                        // let level = T(defblock.querySelector('.ddef_h .def-info'));
+                        // level =  level ? `<span class='level'>${level}</span>` : '';
                         let definition = '';
                         eng_tran = `<span class='eng_tran'>${eng_tran.replace(RegExp(expression, 'gi'),`<b>${expression}</b>`)}</span>`;
                         // chn_tran = `<span class='chn_tran'>${chn_tran}</span>`;
@@ -179,7 +179,7 @@ class encn_Cambridge {
                         definition += phrasehead ? `${phrasehead}${tran}` : `${level}${pos}${guideWord}${tran}`;
 
                         // make exmaple segement
-                        let examps = defblock.querySelectorAll('.def-body .examp') || [];
+                        let examps = defblock.querySelectorAll('.sentence-target') || [];
                         if (examps.length > 0 && this.maxexample > 0) {
                             definition += '<ul class="sents">';
                             for (const [index, examp] of examps.entries()) {
