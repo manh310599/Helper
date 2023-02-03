@@ -33,7 +33,7 @@ class encn_Cambridge {
                 return node.innerText.trim();
         }
 
-        let base = 'https://dictionary.cambridge.org/dictionary/english/';
+        let base = 'https://dictionary.cambridge.org/dictionary/english-vietnamese/';
         let url = base + encodeURIComponent(word);
         let doc = '';
         try {
@@ -44,39 +44,39 @@ class encn_Cambridge {
             return [];
         }
 
-        let entries = doc.querySelectorAll('.pr .entry-body__el') || [];
+        let entries = doc.querySelectorAll('.english-vietnamese .kdic') || [];
         let finalDefinitions = [];
         for (const entry of entries) {
             let definitions = [];
             let audios = [];
 
-            let expression = T(entry.querySelector('.headword'));
+            let expression = T(entry.querySelector('.di-title'));
             let reading = '';
-            let readings = entry.querySelectorAll('.pron .ipa');
+            let readings = entry.querySelectorAll('.dpron .ipa');
             if (readings) {
                 let reading_uk = T(readings[0]);
                 let reading_us = T(readings[1]);
                 reading = (reading_uk || reading_us) ? `\/${reading_uk}\/   \/${reading_us}\/ ` : '';
             }
-            let posText = T(entry.querySelector('.posgram'));
+            let posText = T(entry.querySelector('.di-info .pos'));
             let pos = posText ? `<span class='pos'>${posText}</span>` : '';
-            audios[0] = entry.querySelector(".uk.dpron-i source");
-            audios[0] = audios[0] ? 'https://dictionary.cambridge.org' + audios[0].getAttribute('src') : '';
-            //audios[0] = audios[0].replace('https', 'http');
-            audios[1] = entry.querySelector(".us.dpron-i source");
-            audios[1] = audios[1] ? 'https://dictionary.cambridge.org' + audios[1].getAttribute('src') : '';
+            // audios[0] = entry.querySelector(".uk.dpron-i source");
+            // audios[0] = audios[0] ? 'https://dictionary.cambridge.org' + audios[0].getAttribute('src') : '';
+            // //audios[0] = audios[0].replace('https', 'http');
+            // audios[1] = entry.querySelector(".us.dpron-i source");
+            // audios[1] = audios[1] ? 'https://dictionary.cambridge.org' + audios[1].getAttribute('src') : '';
             //audios[1] = audios[1].replace('https', 'http');
 
             let sensbodys = entry.querySelectorAll('.sense-body') || [];
             for (const sensbody of sensbodys) {
                 let sensblocks = sensbody.childNodes || [];
-                let guideWord = T(sensbody.previousElementSibling.querySelector(".guideword"));
-                guideWord = guideWord ? `<span class='pos'>${guideWord}</span>` : '';
+                // let guideWord = T(sensbody.previousElementSibling.querySelector(".guideword"));
+                // guideWord = guideWord ? `<span class='pos'>${guideWord}</span>` : '';
                 for (const sensblock of sensblocks) {
                     let phrasehead = '';
                     let defblocks = [];
-                    if (sensblock.classList && sensblock.classList.contains('phrase-block')) {
-                        phrasehead = T(sensblock.querySelector('.phrase-title'));
+                    if (sensblock.classList && sensblock.classList.contains('dpos-h di-head normal-entry')) {
+                        phrasehead = T(sensblock.querySelector('def ddef_d db'));
                         phrasehead = phrasehead ? `<div class="phrasehead">${phrasehead}</div>` : '';
                         defblocks = sensblock.querySelectorAll('.def-block') || [];
                     }
@@ -87,7 +87,7 @@ class encn_Cambridge {
 
                     // make definition segement
                     for (const defblock of defblocks) {
-                        let eng_tran = T(defblock.querySelector('.ddef_h .def'));
+                        let eng_tran = T(defblock.querySelector('def ddef_d db'));
                         // let chn_tran = T(defblock.querySelector('.def-body .trans'));
                         if (!eng_tran) continue;
                         let level = T(defblock.querySelector('.ddef_h .def-info'));
@@ -99,7 +99,7 @@ class encn_Cambridge {
                         definition += phrasehead ? `${phrasehead}${tran}` : `${level}${pos}${guideWord}${tran}`;
 
                         // make exmaple segement
-                        let examps = defblock.querySelectorAll('.def-body .examp') || [];
+                        let examps = defblock.querySelectorAll('eg deg') || [];
                         if (examps.length > 0 && this.maxexample > 0) {
                             definition += '<ul class="sents">';
                             for (const [index, examp] of examps.entries()) {
@@ -130,7 +130,7 @@ class encn_Cambridge {
             let definitions = [];
             let audios = [];
 
-            let expression = T(idiom.querySelector('.headword'));
+            let expression = T(idiom.querySelector('tw-bw dhw dpos-h_hw di-title '));
             let reading = '';
             // let readings = idiom.querySelectorAll('.pron .ipa');
             // if (readings) {
@@ -138,7 +138,7 @@ class encn_Cambridge {
             //     let reading_us = T(readings[1]);
             //     reading = (reading_uk || reading_us) ? `\/${reading_uk}\/   \/${reading_us}\/ ` : '';
             // }
-            let pos = T(idiom.querySelector('.posgram'));
+            let pos = T(idiom.querySelector('pos dpos'));
             pos = pos ? `<span class='pos'>${pos}</span>` : '';
             // audios[0] = idiom.querySelector(".uk.dpron-i source");
             // audios[0] = audios[0] ? 'https://dictionary.cambridge.org' + audios[0].getAttribute('src') : '';
